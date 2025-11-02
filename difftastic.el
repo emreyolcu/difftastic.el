@@ -575,6 +575,9 @@ display buffer at bottom."
   :type 'file
   :group 'difftastic)
 
+(defvar difftastic-difft-environment nil
+  "Prepended to `process-environment' while running difft.")
+
 (defcustom difftastic-normal-colors-vector
   (vector
    (aref ansi-color-normal-colors-vector 0)
@@ -1786,13 +1789,14 @@ The DIFFTASTIC-ARGS is a list of extra arguments to pass to
                  (difftastic--add-standard-args (difftastic--args-or-saved
                                                  difftastic-args)
                                                 requested-width))))
-    (cons (format
-           "GIT_EXTERNAL_DIFF=%s%s"
-           difftastic-executable
-           (if difftastic-args
-               (format " %s" (string-join difftastic-args " "))
-             ""))
-          process-environment)))
+    (append (list (format
+                   "GIT_EXTERNAL_DIFF=%s%s"
+                   difftastic-executable
+                   (if difftastic-args
+                       (format " %s" (string-join difftastic-args " "))
+                     "")))
+            difftastic-difft-environment
+            process-environment)))
 
 (defun difftastic--git-with-difftastic (buffer command rev-or-range
                                                &optional difftastic-args action)
